@@ -1,15 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from "react";
 
 function ContactUs() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [phoneType, setPhoneType] = useState('');
-  const [comments, setComments] = useState('');
-  
-  const onSubmit = e => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [phoneType, setPhoneType] = useState("");
+  const [comments, setComments] = useState("");
+  const [validationErrors, setValidationErrors] = useState("");
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+
+  useEffect(() => {
+    const errors = [];
+    if (name.length <= 0) {
+      errors.push("Please enter your name");
+    }
+
+    if (!email.includes("@")) {
+      errors.push("Please provide a valid email");
+    }
+
+    setValidationErrors(errors);
+  }, [name, email]);
+
+  const onSubmit = (e) => {
     // Prevent the default form behavior so the page doesn't reload.
     e.preventDefault();
+
+    setHasSubmitted(true);
+
+    if (validationErrors.length > 0) {
+      return alert("Cannot submit if there are validation errors");
+    }
 
     // Create a new object for the contact us information.
     const contactUsInformation = {
@@ -18,7 +39,7 @@ function ContactUs() {
       phone,
       phoneType,
       comments,
-      submittedOn: new Date()
+      submittedOn: new Date(),
     };
 
     // Ideally, we'd persist this information to a database using a RESTful API.
@@ -26,49 +47,59 @@ function ContactUs() {
     console.log(contactUsInformation);
 
     // Reset the form state.
-    setName('');
-    setEmail('');
-    setPhone('');
-    setPhoneType('');
-    setComments('');
-  }
+    setName("");
+    setEmail("");
+    setPhone("");
+    setPhoneType("");
+    setComments("");
+  };
 
   return (
     <div>
       <h2>Contact Us</h2>
       <form onSubmit={onSubmit}>
+        {hasSubmitted && validationErrors.length > 0 && (
+          <div>
+            The following errors were found:
+            <ul>
+              {validationErrors.map((error) => (
+                <li key={error}>{error}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div>
-          <label htmlFor='name'>Name:</label>
+          <label htmlFor="name">Name:</label>
           <input
-            id='name'
-            type='text'
-            onChange={e => setName(e.target.value)}
+            id="name"
+            type="text"
+            onChange={(e) => setName(e.target.value)}
             value={name}
           />
         </div>
         <div>
-          <label htmlFor='email'>Email:</label>
+          <label htmlFor="email">Email:</label>
           <input
-            id='email'
-            type='text'
-            onChange={e => setEmail(e.target.value)}
+            id="email"
+            type="text"
+            onChange={(e) => setEmail(e.target.value)}
             value={email}
           />
         </div>
         <div>
-          <label htmlFor='phone'>Phone:</label>
+          <label htmlFor="phone">Phone:</label>
           <input
-            id='phone'
-            type='text'
-            onChange={e => setPhone(e.target.value)}
+            id="phone"
+            type="text"
+            onChange={(e) => setPhone(e.target.value)}
             value={phone}
           />
           <select
-            name='phoneType'
-            onChange={e => setPhoneType(e.target.value)}
+            name="phoneType"
+            onChange={(e) => setPhoneType(e.target.value)}
             value={phoneType}
           >
-            <option value='' disabled>
+            <option value="" disabled>
               Select a phone type...
             </option>
             <option>Home</option>
@@ -77,11 +108,11 @@ function ContactUs() {
           </select>
         </div>
         <div>
-          <label htmlFor='comments'>Comments:</label>
+          <label htmlFor="comments">Comments:</label>
           <textarea
-            id='comments'
-            name='comments'
-            onChange={e => setComments(e.target.value)}
+            id="comments"
+            name="comments"
+            onChange={(e) => setComments(e.target.value)}
             value={comments}
           />
         </div>
